@@ -1,0 +1,60 @@
+# OpenEnv manifest — keep `spec_version`, `name`, `type`, `runtime`, `app`, `port`
+# for `openenv validate` compatibility.
+spec_version: 1
+name: CodeReviewEnv
+version: "1.0"
+description: >-
+  AI agent environment for automated code review: agents inspect synthetic
+  snippets, file structured reviews, and receive deterministic graded rewards.
+type: space
+runtime: fastapi
+app: server.app:app
+port: 8000
+
+metadata:
+  tags:
+    - openenv
+    - code-review
+    - security
+  huggingface:
+    sdk: docker
+    app_port: 8000
+
+observation_space:
+  type: object
+  description: >
+    After reset: code_snippet, file_name, language, optional context, reward=0,
+    done=false. After step: same fields plus shaped reward, done=true, metadata
+    with grader tier and breakdown.
+  properties:
+    code_snippet: { type: string }
+    file_name: { type: string }
+    language: { type: string }
+    context: { type: string, nullable: true }
+    reward: { type: number }
+    done: { type: boolean }
+
+action_space:
+  type: object
+  description: Structured single-turn review.
+  properties:
+    review_comment: { type: string }
+    issue_type: { type: string }
+    severity: { type: string, enum: [info, low, medium, high, critical] }
+
+tasks:
+  - id: easy
+    description: Syntax and obvious static bugs (missing colon, indentation, undefined names).
+  - id: medium
+    description: Logic errors in control flow, loops, and returns.
+  - id: hard
+    description: Security issues — SQLi, command injection, unsafe file ops, broken auth.
+
+reward:
+  grader_tiers: ["0.0 incorrect", "0.3 partial", "0.7 right issue weak explanation", "1.0 full"]
+  shaping:
+    issue_correct: +0.5
+    severity_correct: +0.3
+    explanation_helpful: +0.2
+    irrelevant_comment: -0.3
+    hallucinated_issue: -0.5

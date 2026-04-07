@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=45", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "openenv-code-review-env"
+version = "1.0.0"
+description = "CodeReviewEnv — OpenEnv environment for automated code review simulation"
+requires-python = ">=3.10"
+readme = "README.md"
+license = { text = "BSD-3-Clause" }
+dependencies = [
+    "openenv-core[core]>=0.2.2",
+    "fastapi>=0.115.0",
+    "pydantic>=2.0.0",
+    "uvicorn[standard]>=0.24.0",
+    "requests>=2.31.0",
+    "openai>=1.40.0",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0.0"]
+
+[project.scripts]
+server = "server.app:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["env*", "tasks*", "graders*", "server*"]
+
+[tool.setuptools.package-data]
+"*" = ["py.typed"]
