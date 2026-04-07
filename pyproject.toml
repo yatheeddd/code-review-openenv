@@ -30,3 +30,6 @@ include = ["env*", "tasks*", "graders*", "server*"]
 
 [tool.setuptools.package-data]
 "*" = ["py.typed"]
+
+[tool.uv]
+dev-dependencies = ["pytest>=8.0.0"]
